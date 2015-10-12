@@ -38,7 +38,7 @@ server.register({
 ```
 
 ## Tests
-Run comand make test or npm test. Include 100% test coverage.
+Run comand `make test` or `npm test`. Include 100% test coverage.
 
 # License
 MIT
