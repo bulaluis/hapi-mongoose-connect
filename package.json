@@ -4,7 +4,9 @@
   "description": "Mongoose connection for Hapi.js",
   "main": "lib/index.js",
   "scripts": {
-    "test": "./node_modules/lab/bin/lab -c"
+    "test": "./node_modules/lab/bin/lab -c",
+    "test-coverage": "./node_modules/lab/bin/lab -t 100",
+    "test-coverage-html": "./node_modules/lab/bin/lab -c -r html -o ./test/artifacts/coverage.html && open ./test/artifacts/coverage.html"
   },
   "repository": {
     "type": "git",
