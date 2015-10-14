@@ -1,4 +1,4 @@
-# hapi-mongoose
+# hapi-mongoose-connect
 
 Mongoose connection for hapi.js
 
