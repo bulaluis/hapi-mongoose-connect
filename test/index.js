@@ -10,11 +10,7 @@ var Mongoose = require('mongoose');
 // Tests
 
 var lab = exports.lab = Lab.script();
-var options = {
-    uri: 'mongodb://localhost/test-hapi-mongoose'
-}
 var server;
-
 
 lab.before(function (done) {
 
@@ -23,14 +19,15 @@ lab.before(function (done) {
     return done();
 });
 
-
 lab.experiment('Hapi-mongoose Plugin', function () {
 
     lab.test('successfully registered', function (done) {
 
         server.register({
             register: Plugin,
-            options: options
+            options: {
+                mongooseUri: 'mongodb://localhost/test-hapi-mongoose'
+            }
         }, function (err) {
 
             Code.expect(err).to.not.exist();
@@ -40,17 +37,17 @@ lab.experiment('Hapi-mongoose Plugin', function () {
 
     lab.test('mongoose.connection it has been connected', function (done) {
 
-        Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['connected']);  
-        
+        Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['connected']);
+
         return done();
     });
 
     lab.test('on server stop mongoose.connection it has been disconnected', function (done) {
 
         server.stop(function (err) {
-            
+
             Code.expect(err).to.not.exist();
-            Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['disconnected']);           
+            Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['disconnected']);
             return done();
         });
     });
