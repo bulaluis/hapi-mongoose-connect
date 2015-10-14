@@ -18,7 +18,8 @@ server.connection({ port: 8000 });
 server.register({
 		register: require('hapi-mongoose-connect'),
 		options: {
-			uri: 'mongodb://localhost/my-database'
+			mongooseUri: 'mongodb://localhost/my-database',
+			mongooseOptions: {}		// http://mongoosejs.com/docs/connections.html
 		}
 	}, function (err) {
 
