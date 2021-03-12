@@ -1,8 +1,9 @@
 // Load modules
 
-var Lab = require('lab');
-var Code = require('code');
-var Hapi = require('hapi');
+var Lab = require('@hapi/lab');
+var Code = require('@hapi/code');
+var Hapi = require('@hapi/hapi');
+var Hoek = require('@hapi/hoek');
 var Plugin = require('../lib');
 var Mongoose = require('mongoose');
 
@@ -12,43 +13,39 @@ var Mongoose = require('mongoose');
 var lab = exports.lab = Lab.script();
 var server;
 
-lab.before(function (done) {
+lab.experiment('Hapi-mongoose Plugin', () => {
 
-    server = new Hapi.Server();
-    server.connection({ port: 3000 });
-    return done();
-});
+    lab.before(async () => {
+      server = Hapi.server({ port: 3000 });  
+      await server.start();
+      server.events.on('log', (event, tags) => {      
+              console.log(event);
+      });
+    });
 
-lab.experiment('Hapi-mongoose Plugin', function () {
+    lab.test('successfully registered', async () => {
 
-    lab.test('successfully registered', function (done) {
-
-        server.register({
-            register: Plugin,
+        await server.register({
+            plugin: Plugin,
             options: {
                 mongooseUri: 'mongodb://localhost/test-hapi-mongoose'
             }
-        }, function (err) {
-
-            Code.expect(err).to.not.exist();
-            return done();
         });
+
     });
 
-    lab.test('mongoose.connection it has been connected', function (done) {
+    lab.test('mongoose.connection it has been connected', async () => {
+      while (Mongoose.connection.readyState === Mongoose.STATES['connecting']) {
+        await Hoek.wait(100);
+      }
+      Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['connected']);
+    }); 
 
-        Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['connected']);
-
-        return done();
-    });
-
-    lab.test('on server stop mongoose.connection it has been disconnected', function (done) {
-
-        server.stop(function (err) {
-
-            Code.expect(err).to.not.exist();
-            Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['disconnected']);
-            return done();
-        });
+    lab.test('on server stop mongoose.connection it has been disconnected', async () => {
+        await server.stop();   
+        while (Mongoose.connection.readyState === Mongoose.STATES['disconnecting']) {
+          await Hoek.wait(100);
+        }        
+        Code.expect(Mongoose.connection.readyState).to.be.equal(Mongoose.STATES['disconnected']);
     });
 });
